@@ -1,0 +1,46 @@
+@page "/"
+@rendermode InteractiveServer
+@inject IDiscogsService DiscogsService
+
+<PageTitle>Discogs Roulette</PageTitle>
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h1 class="card-title h4 mb-4">What should I listen to?</h1>
+                
+                @* TODO: Implement username input form *@
+                @* Hint: Use EditForm with a model or simple input binding *@
+                <div class="mb-3">
+                    <label for="username" class="form-label">Discogs Username</label>
+                    <input @bind="Username" @bind:event="oninput" type="text" class="form-control" id="username" 
+                           placeholder="Enter your Discogs username" />
+                </div>
+                
+                <button class="btn btn-primary" disabled>
+                    Load Collection
+                </button>
+            </div>
+        </div>
+        
+        @* TODO: Add collection display section *@
+        @* TODO: Add random selection button and result display *@
+        
+    </div>
+</div>
+
+@code {
+
+    // TODO: Add state variables for:
+    private string? Username {get; set; }
+    // - Username input
+    // - Collection data
+    // - Loading state
+    // - Selected random album
+    // - Error messages
+    
+    // TODO: Implement methods for:
+    // - Loading collection from Discogs
+    // - Randomly selecting an album
+}

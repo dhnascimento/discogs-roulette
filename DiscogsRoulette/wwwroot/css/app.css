@@ -1,0 +1,40 @@
+/* Custom styles for Discogs Roulette */
+
+/* Add any custom styles here as you develop the app */
+
+.album-card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.album-card:hover {
+    transform: scale(1.02);
+}
+
+.selected-album {
+    border: 3px solid #198754;
+    animation: pulse 0.5s ease-in-out;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Spinner for loading states */
+.spinner-overlay {
+    position: relative;
+}
+
+.spinner-overlay::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
