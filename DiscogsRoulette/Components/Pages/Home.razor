@@ -5,7 +5,7 @@
 <PageTitle>Discogs Roulette</PageTitle>
 
 <div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
+    <div class="col-12 col-lg-10">
         <div class="card shadow-sm">
             <div class="card-body">
                 <h1 class="card-title h4 mb-4">What should I listen to?</h1>
@@ -19,29 +19,135 @@
                            placeholder="Enter your Discogs username" />
                 </div>
                 
-                <button class="btn btn-primary" disabled>
+                <button class="btn btn-primary" @onclick="LoadCollection" disabled="@(IsLoading || string.IsNullOrWhiteSpace(Username))">
+                    @if (IsLoading)
+                    {
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                    }
                     Load Collection
                 </button>
+
+                @if (!string.IsNullOrEmpty(ErrorMessage))
+                {
+                    <div class="alert alert-danger mt-3">@ErrorMessage</div>
+                }
             </div>
         </div>
         
-        @* TODO: Add collection display section *@
-        @* TODO: Add random selection button and result display *@
-        
+        @if (Collection?.Releases.Any() == true)
+        {
+            <div class="card shadow-sm mt-4">
+                <div class="card-body text-center">
+                    <button class="btn btn-success btn-lg" @onclick="SelectRandomAlbum">
+                        Pick Random Album
+                    </button>
+                </div>
+            </div>
+
+            @if (SelectedAlbum != null)
+            {
+                <div class="card shadow-sm mt-4 border-success">
+                    <div class="card-body">
+                        <h2 class="h5 mb-3 text-center">You should listen to...</h2>
+                        <div class="row align-items-center">
+                            <div class="col-md-4 text-center">
+                                <img src="@(SelectedAlbum.BasicInformation?.CoverImage ?? SelectedAlbum.BasicInformation?.Thumb ?? "/images/placeholder.png")"
+                                     class="img-fluid rounded shadow"
+                                     alt="@SelectedAlbum.BasicInformation?.Title"
+                                     style="max-height: 250px;" />
+                            </div>
+                            <div class="col-md-8 mt-3 mt-md-0">
+                                <h3 class="h4 mb-2">@SelectedAlbum.BasicInformation?.ArtistDisplay</h3>
+                                <h4 class="h5 text-muted mb-3">@SelectedAlbum.BasicInformation?.Title</h4>
+                                @if (SelectedAlbum.BasicInformation?.Year > 0)
+                                {
+                                    <p class="mb-1"><strong>Year:</strong> @SelectedAlbum.BasicInformation.Year</p>
+                                }
+                                @if (SelectedAlbum.BasicInformation?.Genres.Any() == true)
+                                {
+                                    <p class="mb-1"><strong>Genre:</strong> @string.Join(", ", SelectedAlbum.BasicInformation.Genres)</p>
+                                }
+                                @if (SelectedAlbum.BasicInformation?.Formats.Any() == true)
+                                {
+                                    <p class="mb-0"><strong>Format:</strong> @string.Join(", ", SelectedAlbum.BasicInformation.Formats.Select(f => f.Name))</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="mt-4">
+                <h2 class="h5 mb-3">Collection (@Collection.Releases.Count albums)</h2>
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+                    @foreach (var release in Collection.Releases)
+                    {
+                        <div class="col">
+                            <div class="card h-100 shadow-sm">
+                                <img src="@(release.BasicInformation?.CoverImage ?? release.BasicInformation?.Thumb ?? "/images/placeholder.png")"
+                                     class="card-img-top"
+                                     alt="@release.BasicInformation?.Title"
+                                     style="aspect-ratio: 1; object-fit: cover;" />
+                                <div class="card-body p-2">
+                                    <p class="card-text mb-1 fw-bold text-truncate" title="@release.BasicInformation?.ArtistDisplay">
+                                        @release.BasicInformation?.ArtistDisplay
+                                    </p>
+                                    <p class="card-text text-muted small text-truncate mb-0" title="@release.BasicInformation?.Title">
+                                        @release.BasicInformation?.Title
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
     </div>
 </div>
 
 @code {
+    private string? Username { get; set; }
+    private CollectionResponse? Collection { get; set; }
+    private bool IsLoading { get; set; }
+    private string? ErrorMessage { get; set; }
+    private CollectionRelease? SelectedAlbum { get; set; }
+    private readonly Random _random = new();
 
-    // TODO: Add state variables for:
-    private string? Username {get; set; }
-    // - Username input
-    // - Collection data
-    // - Loading state
-    // - Selected random album
-    // - Error messages
-    
-    // TODO: Implement methods for:
-    // - Loading collection from Discogs
-    // - Randomly selecting an album
+    private async Task LoadCollection()
+    {
+        if (string.IsNullOrWhiteSpace(Username))
+            return;
+
+        IsLoading = true;
+        ErrorMessage = null;
+        Collection = null;
+        SelectedAlbum = null;
+
+        try
+        {
+            Collection = await DiscogsService.GetCollectionAsync(Username);
+            if (Collection == null)
+            {
+                ErrorMessage = "Could not load collection. Check the username.";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private void SelectRandomAlbum()
+    {
+        if (Collection?.Releases.Any() != true)
+            return;
+
+        var index = _random.Next(Collection.Releases.Count);
+        SelectedAlbum = Collection.Releases[index];
+    }
 }
