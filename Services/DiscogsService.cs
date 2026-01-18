@@ -23,13 +23,31 @@ public class DiscogsService : IDiscogsService
 
         try
         {
-            var url = $"/users/{username}/collection/folders/0/releases";
+            var url = $"/users/{username}/collection/folders/0/releases?&sort=artist&sort_order=asc";
             var response = await _httpClient.GetFromJsonAsync<CollectionResponse>(url, cancellationToken);
             return response;
         }
         catch (HttpRequestException ex)
         {
             _logger.LogError(ex, "Failed to fetch collection for user {Username}", username);
+            return null;
+        }
+    }
+
+    public async Task<CollectionResponse?> GetCollectionPageAsync(string username, int page, int perPage = 50, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(username))
+            return null;
+
+        try
+        {
+            var url = $"/users/{username}/collection/folders/0/releases?page={page}&per_page={perPage}&sort=artist&sort_order=asc";
+            var response = await _httpClient.GetFromJsonAsync<CollectionResponse>(url, cancellationToken);
+            return response;
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "Failed to fetch collection page {Page} for user {Username}", page, username);
             return null;
         }
     }

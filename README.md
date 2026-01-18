@@ -10,7 +10,7 @@ A Blazor Server web application that helps you decide what to listen to from you
 
 ## Prerequisites
 
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
 - A [Discogs](https://www.discogs.com/) account with a public collection
 
 ## Getting Started

@@ -9,23 +9,37 @@
         <div class="card shadow-sm">
             <div class="card-body">
                 <h1 class="card-title h4 mb-4">What should I listen to?</h1>
-                <h2 class="card-title h4 mb-4">@Username</h2>
                 
-                @* TODO: Implement username input form *@
-                @* Hint: Use EditForm with a model or simple input binding *@
                 <div class="mb-3">
                     <label for="username" class="form-label">Discogs Username</label>
-                    <input @bind="Username" @bind:event="oninput" type="text" class="form-control" id="username" 
+                    <input @bind="Username" type="text" class="form-control" id="username" 
                            placeholder="Enter your Discogs username" />
                 </div>
+
                 
-                <button class="btn btn-primary" @onclick="LoadCollection" disabled="@(IsLoading || string.IsNullOrWhiteSpace(Username))">
-                    @if (IsLoading)
-                    {
-                        <span class="spinner-border spinner-border-sm me-2"></span>
-                    }
-                    Load Collection
-                </button>
+                @if(Collection?.Releases.Any() == true) {
+                    <button class="btn btn-danger" @onclick="ClearCollection">Clear All</button>
+                } else {
+                    <button class="btn btn-primary" @onclick="LoadCollection" disabled="@(IsLoading || string.IsNullOrWhiteSpace(Username))">
+                        @if (IsLoading)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2"></span>
+                            @if (TotalPages > 1)
+                            {
+                                <span>Loading page @CurrentPage of @TotalPages...</span>
+                            }
+                            else
+                            {
+                                <span>Loading...</span>
+                            }
+                        }
+                        else
+                        {
+                            <span>Load Collection</span>
+                        }
+                    </button>
+                }
+                
 
                 @if (!string.IsNullOrEmpty(ErrorMessage))
                 {
@@ -113,6 +127,8 @@
     private string? ErrorMessage { get; set; }
     private CollectionRelease? SelectedAlbum { get; set; }
     private readonly Random _random = new();
+    private int CurrentPage { get; set; }
+    private int TotalPages { get; set; }
 
     private async Task LoadCollection()
     {
@@ -123,13 +139,44 @@
         ErrorMessage = null;
         Collection = null;
         SelectedAlbum = null;
+        CurrentPage = 0;
+        TotalPages = 0;
 
         try
         {
+            // Fetch the first page
             Collection = await DiscogsService.GetCollectionAsync(Username);
             if (Collection == null)
             {
                 ErrorMessage = "Could not load collection. Check the username.";
+                return;
+            }
+
+            // Set pagination info
+            CurrentPage = 1;
+            TotalPages = Collection.Pagination?.Pages ?? 1;
+
+            // Check if there are multiple pages
+            if (Collection.Pagination != null && Collection.Pagination.Pages > 1)
+            {
+                var allReleases = new List<CollectionRelease>(Collection.Releases);
+
+                // Fetch remaining pages (starting from page 2)
+                for (int page = 2; page <= TotalPages; page++)
+                {
+                    CurrentPage = page;
+                    StateHasChanged();
+
+                    var pageResponse = await DiscogsService.GetCollectionPageAsync(Username, page);
+
+                    if (pageResponse?.Releases != null)
+                    {
+                        allReleases.AddRange(pageResponse.Releases);
+                    }
+                }
+
+                // Update collection with all releases
+                Collection.Releases = allReleases;
             }
         }
         catch (Exception ex)
@@ -140,6 +187,12 @@
         {
             IsLoading = false;
         }
+    }
+
+    private void ClearCollection()
+    {
+        Collection = null;
+
     }
 
     private void SelectRandomAlbum()

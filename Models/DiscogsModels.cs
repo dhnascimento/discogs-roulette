@@ -30,8 +30,29 @@ public class Pagination
     
     [JsonPropertyName("items")]
     public int Items { get; set; }
+
+    [JsonPropertyName("urls")]
+    public URLs? URLs { get; set; }
+
 }
 
+/// <summary>
+/// URLs for pagination requests
+/// </summary>
+public class URLs
+{
+    [JsonPropertyName("last")]
+    public string? Last { get; set; }
+
+    [JsonPropertyName("next")]
+    public string? Next { get; set; }
+
+    [JsonPropertyName("first")]
+    public string? First { get; set; }
+
+    [JsonPropertyName("prev")]
+    public string? Prev { get; set; }
+}
 /// <summary>
 /// A release in the user's collection
 /// </summary>
