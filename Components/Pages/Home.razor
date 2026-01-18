@@ -12,8 +12,9 @@
                 
                 <div class="mb-3">
                     <label for="username" class="form-label">Discogs Username</label>
-                    <input @bind="Username" type="text" class="form-control" id="username" 
-                           placeholder="Enter your Discogs username" />
+                    <input @bind="Username" type="text" class="form-control" id="username"
+                           placeholder="Enter your Discogs username"
+                           disabled="@(Collection?.Releases.Any() == true)" />
                 </div>
 
                 
