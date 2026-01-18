@@ -1,18 +1,17 @@
 # Build stage
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
 # Copy csproj and restore dependencies
-COPY DiscogsRoulette/*.csproj ./DiscogsRoulette/
-RUN dotnet restore DiscogsRoulette/DiscogsRoulette.csproj
+COPY *.csproj ./
+RUN dotnet restore DiscogsRoulette.csproj
 
 # Copy everything else and build
 COPY . .
-WORKDIR /src/DiscogsRoulette
 RUN dotnet publish -c Release -o /app/publish
 
 # Runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 WORKDIR /app
 
 # Create non-root user for security
