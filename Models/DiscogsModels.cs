@@ -1,6 +1,48 @@
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace DiscogsRoulette.Models;
+
+/// <summary>
+/// Custom JSON converter to handle label IDs that can be either integers or strings
+/// (Discogs API returns empty strings or non-numeric values for self-released/bootleg albums)
+/// </summary>
+public class FlexibleIntConverter : JsonConverter<int?>
+{
+    public override int? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        switch (reader.TokenType)
+        {
+            case JsonTokenType.Number:
+                return reader.GetInt32();
+
+            case JsonTokenType.String:
+                var stringValue = reader.GetString();
+                if (string.IsNullOrWhiteSpace(stringValue))
+                    return null;
+
+                if (int.TryParse(stringValue, out var intValue))
+                    return intValue;
+
+                // Return null for non-numeric strings like "Not On Label"
+                return null;
+
+            case JsonTokenType.Null:
+                return null;
+
+            default:
+                throw new JsonException($"Unexpected token type: {reader.TokenType}");
+        }
+    }
+
+    public override void Write(Utf8JsonWriter writer, int? value, JsonSerializerOptions options)
+    {
+        if (value.HasValue)
+            writer.WriteNumberValue(value.Value);
+        else
+            writer.WriteNullValue();
+    }
+}
 
 /// <summary>
 /// Response from the Discogs collection endpoint
@@ -133,7 +175,8 @@ public class Artist
 public class Label
 {
     [JsonPropertyName("id")]
-    public int Id { get; set; }
+    [JsonConverter(typeof(FlexibleIntConverter))]
+    public int? Id { get; set; }
     
     [JsonPropertyName("name")]
     public string Name { get; set; } = string.Empty;
