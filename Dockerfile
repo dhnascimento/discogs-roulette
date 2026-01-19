@@ -8,7 +8,7 @@ RUN dotnet restore DiscogsRoulette.csproj
 
 # Copy everything else and build
 COPY . .
-RUN dotnet publish -c Release -o /app/publish
+RUN dotnet publish DiscogsRoulette.csproj -c Release -o /app/publish
 
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
