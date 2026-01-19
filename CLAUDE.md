@@ -51,6 +51,11 @@ DiscogsRoulette/
 - Album cover image display
 - Integration with music streaming services
 
+## Publishing Commands
+``bash
+# Deploy app to Fly.io
+fly deploy
+
 ## Development Commands
 ```bash
 # Run the application

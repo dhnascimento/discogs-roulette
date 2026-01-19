@@ -69,3 +69,15 @@ appsettings.Local.json
 
 # Docker
 .docker/
+docker-compose.override.yml
+
+# Fly.io
+.fly/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Production settings (may contain secrets)
+appsettings.Production.json

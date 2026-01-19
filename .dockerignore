@@ -1,0 +1,73 @@
+# flyctl launch added from .gitignore
+# Build results
+**/[Dd]ebug
+**/[Rr]elease
+**/x64
+**/x86
+**/[Ww][Ii][Nn]32
+**/[Aa][Rr][Mm]
+**/[Aa][Rr][Mm]64
+**/bld
+**/[Bb]in
+**/[Oo]bj
+**/[Ll]og
+**/[Ll]ogs
+
+# Visual Studio files
+**/.vs
+**/*.user
+**/*.suo
+**/*.userosscache
+**/*.sln.docstates
+
+# JetBrains Rider
+**/.idea
+**/*.sln.iml
+
+# VS Code
+**/.vscode
+
+# .NET Core
+**/project.lock.json
+**/project.fragment.lock.json
+**/artifacts
+
+# User-specific files
+**/*.rsuser
+**/*.userprefs
+
+# Build artifacts
+**/*.dll
+**/*.exe
+**/*.pdb
+**/*.mdb
+
+# NuGet Packages
+**/*.nupkg
+**/*.snupkg
+**/.nuget
+**/nuget.exe
+
+# Test results
+**/[Tt]est[Rr]esult*
+**/*.trx
+**/*.coverage
+**/*.coveragexml
+
+# macOS
+**/.DS_Store
+**/.AppleDouble
+**/.LSOverride
+
+# Linux
+**/*~
+
+# Environment files (may contain secrets)
+**/.env
+**/.env.local
+**/.env.*.local
+**/appsettings.Local.json
+
+# Docker
+**/.docker
+fly.toml
